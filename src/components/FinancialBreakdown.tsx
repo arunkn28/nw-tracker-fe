@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusCircle, Pencil, Trash2 } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { formatCurrency } from "@/lib/currencyUtils";
 
 interface FinancialItem {
   id: string;
@@ -39,6 +41,7 @@ export default function FinancialBreakdown({
   const [activeTab, setActiveTab] = useState("assets");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemType, setItemType] = useState<"asset" | "liability">("asset");
+  const { userCurrency } = useUser();
 
   // Default data if none provided
   const defaultAssets: FinancialItem[] = [
@@ -92,7 +95,7 @@ export default function FinancialBreakdown({
           <TabsContent value="assets" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">
-                Total Assets: ${calculateTotal(assetData).toLocaleString()}
+                Total Assets: {formatCurrency(calculateTotal(assetData), userCurrency)}
               </h3>
               <Button
                 onClick={() => handleAddItem("asset")}
@@ -120,7 +123,7 @@ export default function FinancialBreakdown({
                           <span>{asset.name}</span>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">
-                              ${asset.value.toLocaleString()}
+                              {formatCurrency(asset.value, userCurrency)}
                             </span>
                             <Button
                               variant="ghost"
@@ -148,8 +151,7 @@ export default function FinancialBreakdown({
           <TabsContent value="liabilities" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">
-                Total Liabilities: $
-                {calculateTotal(liabilityData).toLocaleString()}
+                Total Liabilities: {formatCurrency(calculateTotal(liabilityData), userCurrency)}
               </h3>
               <Button
                 onClick={() => handleAddItem("liability")}
@@ -177,7 +179,7 @@ export default function FinancialBreakdown({
                           <span>{liability.name}</span>
                           <div className="flex items-center gap-2">
                             <span className="font-medium">
-                              ${liability.value.toLocaleString()}
+                              {formatCurrency(liability.value, userCurrency)}
                             </span>
                             <Button
                               variant="ghost"

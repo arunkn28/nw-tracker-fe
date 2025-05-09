@@ -6,6 +6,8 @@ import {
   DollarSign,
   AlertCircle,
 } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { formatCurrency } from "@/lib/currencyUtils";
 
 interface StatisticsPanelProps {
   netWorth?: number;
@@ -26,6 +28,7 @@ export default function StatisticsPanel({
   largestAsset = { name: "Home Value", value: 350000 },
   largestLiability = { name: "Mortgage", value: 280000 },
 }: StatisticsPanelProps) {
+  const { userCurrency } = useUser();
   const growthAmount = netWorth - previousNetWorth;
   const growthPercentage = ((growthAmount / previousNetWorth) * 100).toFixed(1);
   const isPositiveGrowth = growthAmount >= 0;
@@ -48,7 +51,7 @@ export default function StatisticsPanel({
               </div>
             </div>
             <p className="text-2xl font-bold mt-2">
-              ${netWorth.toLocaleString()}
+              {formatCurrency(netWorth, userCurrency)}
             </p>
           </div>
 
@@ -72,7 +75,7 @@ export default function StatisticsPanel({
               <p className="text-2xl font-bold">{growthPercentage}%</p>
               <p className="text-sm text-muted-foreground">
                 {isPositiveGrowth ? "+" : ""}
-                {growthAmount.toLocaleString()} from previous period
+                {formatCurrency(growthAmount, userCurrency)} from previous period
               </p>
             </div>
           </div>
@@ -88,7 +91,7 @@ export default function StatisticsPanel({
               </div>
             </div>
             <p className="text-2xl font-bold mt-2">
-              ${largestAsset.value.toLocaleString()}
+              {formatCurrency(largestAsset.value, userCurrency)}
             </p>
             <p className="text-sm text-muted-foreground">{largestAsset.name}</p>
           </div>
@@ -104,7 +107,7 @@ export default function StatisticsPanel({
               </div>
             </div>
             <p className="text-2xl font-bold mt-2">
-              ${largestLiability.value.toLocaleString()}
+              {formatCurrency(largestLiability.value, userCurrency)}
             </p>
             <p className="text-sm text-muted-foreground">
               {largestLiability.name}

@@ -1,30 +1,43 @@
-import { Line } from "react-chartjs-2";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUser } from "@/context/UserContext";
+import { getCurrencySymbol } from "@/lib/currencyUtils";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
 
 interface NetWorthChartProps {
-  data?: {
-    labels: string[];
-    datasets: {
-      label: string;
-      data: number[];
-      borderColor: string;
-      backgroundColor: string;
-    }[];
-  };
+  data?: any;
 }
 
 export default function NetWorthChart({ data }: NetWorthChartProps) {
   const [timeRange, setTimeRange] = useState<
     "monthly" | "quarterly" | "yearly"
   >("monthly");
+  
+  const { userCurrency } = useUser();
+  const currencySymbol = getCurrencySymbol(userCurrency);
 
   // Default data if none provided
   const defaultData = {
@@ -77,7 +90,7 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
       y: {
         beginAtZero: false,
         ticks: {
-          callback: (value: number) => `$${value.toLocaleString()}`,
+          callback: (value: number) => `${currencySymbol}${value.toLocaleString()}`,
         },
       },
     },
@@ -87,31 +100,23 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
     <Card className="w-full bg-white">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Net Worth Trend</CardTitle>
-        <Select
+        <Tabs
           value={timeRange}
-          onValueChange={(value: "monthly" | "quarterly" | "yearly") =>
-            setTimeRange(value)
+          onValueChange={(value) =>
+            setTimeRange(value as "monthly" | "quarterly" | "yearly")
           }
+          className="w-[400px]"
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select time range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="monthly">Monthly</SelectItem>
-            <SelectItem value="quarterly">Quarterly</SelectItem>
-            <SelectItem value="yearly">Yearly</SelectItem>
-          </SelectContent>
-        </Select>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="monthly">Monthly</TabsTrigger>
+            <TabsTrigger value="quarterly">Quarterly</TabsTrigger>
+            <TabsTrigger value="yearly">Yearly</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
-          {/* Note: This is a placeholder. You'll need to install react-chartjs-2 and chart.js */}
-          <div className="flex items-center justify-center h-full border border-dashed border-gray-300 rounded-md">
-            <p className="text-muted-foreground">
-              Chart visualization will appear here after installing chart.js
-              dependencies
-            </p>
-          </div>
+          <Line options={options} data={chartData} />
         </div>
       </CardContent>
     </Card>
